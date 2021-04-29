@@ -15,9 +15,20 @@ class Ship:
 
 
 class ShipDict:
+    def __init__(self):
+        self.ships={}
 
     def add_chunk(self, chunk):
-        pass
+        if len(chunk)== 7:
+            id,lat,lon,_,_,_,time=chunk
+            ship=Ship(id)
+        else:
+            id,lat,lon,_,_,time,name,_,_,_,country,*_=chunk
+            ship = Ship(id,name,country)
+        position = Position(lat,lon,time)
+        liste_positions=self.ships.setdefault(ship,[])
+        liste_positions.append(position)
+
 
     def clean_unnamed(self):
         pass
