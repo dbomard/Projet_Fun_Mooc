@@ -13,6 +13,12 @@ class Ship:
         self.name = name
         self.country = country
 
+    def __eq__(self, other):
+        return self.id==other.id
+
+    def __hash__(self):
+        return hash((self.id,))
+
 
 class ShipDict:
     def __init__(self):
@@ -31,13 +37,19 @@ class ShipDict:
 
 
     def clean_unnamed(self):
-        pass
+        ships = self.ships.keys()
+        to_remove=[]
+        for ship in ships:
+            if ship.name=='':
+                to_remove.append(ship)
+        for s in to_remove:
+            self.ships.pop(s)
 
     def sort(self):
-        pass
+        self.ships=dict(sorted(self.ships.items(),key=lambda item :item[0].name))
 
     def all_ships(self):
-        pass
+        return list(self.ships.keys())
 
     def ships_by_name(self, ship_name):
         pass
