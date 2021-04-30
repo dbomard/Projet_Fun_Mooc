@@ -32,28 +32,30 @@ class ShipDict:
         self.ships={}
 
     def add_chunk(self, chunk):
-        if len(chunk)== 7:
+        if len(chunk) == 7:
             id,lat,lon,_,_,_,time=chunk
             ship=Ship(id)
         else:
             id,lat,lon,_,_,time,name,_,_,_,country,*_=chunk
             ship = Ship(id,name,country)
-        position = Position(lat,lon,time)
+        // TODO : Change the creation of the dictionnary to have dict{ship_id:ship}
+        """position = Position(lat,lon,time)
         liste_positions=self.ships.setdefault(ship,[])
-        liste_positions.append(position)
+        liste_positions.append(position)"""
 
 
     def clean_unnamed(self):
-        ships = self.ships.keys()
+        ships = self.ships.values()
         to_remove=[]
         for ship in ships:
-            if ship.name=='':
+            if ship.name == '':
                 to_remove.append(ship)
         for s in to_remove:
             self.ships.pop(s)
 
     def sort(self):
-        self.ships=dict(sorted(self.ships.items(),key=lambda item :item[0].name))
+        for ship in self.ships.values():
+            ship.sort_positions()
 
     def all_ships(self):
         return list(self.ships.keys())
