@@ -5,15 +5,23 @@ class Position:
         self.longitude = longitude
         self.timestamp = time
 
+    def d_m_s(self,f):
+        d = int(f)
+        m=int((f-d)*60)
+        s = int((f-d)*3600-60*m)
+        return f"{d:02d}.{m:02d}'{s:02d}''"
+
+
     def __repr__(self):
-        mnt, sec = divmod(abs(self.latitude)*3600,60)
-        deg, mnt = divmod(mnt, 60)
-        latitude = f"{int(deg):02}.{int(mnt):02}'{int(sec):02}'' "+('N' if self.latitude>0 else 'S ')
-        mnt, sec = divmod(abs(self.longitude)*3600,60)
-        deg, mnt = divmod(mnt,60)
-        longitude = f"{int(deg):02}.{int(mnt):02}'{int(sec):02}'' "+('E' if self.longitude>0 else 'W ')
+        latitude = self.d_m_s(abs(self.latitude))+(' N ' if self.latitude>0 else ' S ')
+        longitude = self.d_m_s(abs(self.longitude))+(' E ' if self.longitude>0 else ' W ')
         return '<'+latitude+longitude+f'@ {self.timestamp}'+'>'
 
+    def __eq__(self, other):
+        return self.timestamp==other.timestamp
+
+    def __hash__(self):
+        return hash((self.timestamp))
 
 class Ship:
 
