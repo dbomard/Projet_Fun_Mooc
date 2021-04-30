@@ -5,6 +5,15 @@ class Position:
         self.longitude = longitude
         self.timestamp = time
 
+    def __repr__(self):
+        mnt, sec = divmod(abs(self.latitude)*3600,60)
+        deg, mnt = divmod(mnt, 60)
+        latitude = f"{int(deg):02}.{int(mnt):02}'{int(sec):02}'' "+('N' if self.latitude>0 else 'S ')
+        mnt, sec = divmod(abs(self.longitude)*3600,60)
+        deg, mnt = divmod(mnt,60)
+        longitude = f"{int(deg):02}.{int(mnt):02}'{int(sec):02}'' "+('E' if self.longitude>0 else 'W ')
+        return '<'+latitude+longitude+f'@ {self.timestamp}'+'>'
+
 
 class Ship:
 
@@ -24,7 +33,8 @@ class Ship:
         self.positions.sort(key=lambda position:position.timestamp)
         
     def add_position(self, position):
-        self.append(position)
+        self.positions.append(position)
+        self.positions=list(set(self.positions))
 
 
 class ShipDict:
@@ -34,15 +44,17 @@ class ShipDict:
     def add_chunk(self, chunk):
         if len(chunk) == 7:
             id,lat,lon,_,_,_,time=chunk
-            ship=Ship(id)
+            if id not in self.ships:
+                self.ships[id]=Ship(id)
         else:
             id,lat,lon,_,_,time,name,_,_,_,country,*_=chunk
-            ship = Ship(id,name,country)
-        // TODO : Change the creation of the dictionnary to have dict{ship_id:ship}
-        """position = Position(lat,lon,time)
-        liste_positions=self.ships.setdefault(ship,[])
-        liste_positions.append(position)"""
-
+            if id in self.ships:
+                if self.ships[id].name=='':
+                    self.ships[id].name = name
+            else:
+                self.ships[id]=Ship(id,name,country)
+        self.ships[id].add_position(Position(lat,lon,time))
+        #TODO : Change the creation of the dictionnary to have dict{ship_id:ship}
 
     def clean_unnamed(self):
         ships = self.ships.values()
@@ -51,14 +63,14 @@ class ShipDict:
             if ship.name == '':
                 to_remove.append(ship)
         for s in to_remove:
-            self.ships.pop(s)
+            self.ships.pop(s.id)
 
     def sort(self):
         for ship in self.ships.values():
             ship.sort_positions()
 
     def all_ships(self):
-        return list(self.ships.keys())
+        return list(self.ships.values())
 
     def ships_by_name(self, ship_name):
-        pass
+        return [ship for ship in self.ships.values() if ship.name==ship_name]
