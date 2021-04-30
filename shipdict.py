@@ -12,12 +12,19 @@ class Ship:
         self.id = ship_id
         self.name = name
         self.country = country
+        self.positions = []
 
     def __eq__(self, other):
         return self.id==other.id
 
     def __hash__(self):
         return hash((self.id,))
+    
+    def sort_positions(self):
+        self.positions.sort(key=lambda position:position.timestamp)
+        
+    def add_position(self, position):
+        self.append(position)
 
 
 class ShipDict:
